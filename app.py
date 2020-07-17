@@ -46,6 +46,9 @@ class Venue(db.Model):
     seeking_talent = db.Column(db.Boolean, default=False, nullable=False)
     seeking_description = db.Column(db.String(), nullable=True)
 
+    # Eager load to count upcoming/passed shows
+    shows = db.relationship('Show', backref='venue', lazy='select')
+
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
 class Artist(db.Model):
@@ -59,9 +62,11 @@ class Artist(db.Model):
     genres = db.Column(db.String(120), nullable=True)
     image_link = db.Column(db.String(500), nullable=True)
     facebook_link = db.Column(db.String(120), nullable=True)
-    website = db.Column(db.String(120), nullable=False)
+    website = db.Column(db.String(120), nullable=True)
     seeking_venue = db.Column(db.Boolean, default=False, nullable=False)
     seeking_description = db.Column(db.String(), nullable=True)
+
+    shows = db.relationship('Show', backref='artist', lazy=True)
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
@@ -71,6 +76,8 @@ class Show(db.Model):
 
   id = db.Column(db.Integer, primary_key=True)
   start_time = db.Column(db.DateTime, nullable=False)
+  artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'), nullable=False)
+  venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'), nullable=False)
 
 #----------------------------------------------------------------------------#
 # Filters.
