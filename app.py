@@ -160,6 +160,7 @@ def venues():
   # TODO: replace with real venues data.
   #       num_shows should be aggregated based on number of upcoming shows per venue.
   venues = Venue.query.order_by('id').all()
+
   venues_by_city_and_state = dict()
   for venue in venues:
     venues_list_for_city_state = venues_by_city_and_state.get((venue.city, venue.state), [])
@@ -231,8 +232,35 @@ def create_venue_submission():
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
 
-  # on successful db insert, flash success
-  flash('Venue ' + request.form['name'] + ' was successfully listed!')
+  form = VenueForm()
+
+  data = {
+    'name': form.name.data,
+    'city': form.city.data,
+    'state': form.state.data,
+    'address': form.address.data,
+    'phone': form.phone.data,
+    'genres': ','.join(form.genres.data),
+    'image_link': form.image_link.data,
+    'facebook_link': form.facebook_link.data,
+    'website': form.website.data,
+    'seeking_talent': form.seeking_talent.data,
+    'seeking_description': form.seeking_description.data,
+  }
+
+  try:
+    new_venue = Venue(**data)
+
+    db.session.add(new_venue)
+    db.session.commit()
+
+    flash('Venue ' + new_venue.name + ' was successfully listed!')
+  except:
+    db.session.rollback()
+    flash('An error occurred. Venue ' + new_venue.name + ' could not be listed.')
+  finally:
+    db.session.close()
+
   # TODO: on unsuccessful db insert, flash an error instead.
   # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
   # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
