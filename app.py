@@ -286,6 +286,28 @@ def edit_artist(artist_id):
 def edit_artist_submission(artist_id):
   # TODO: take values from the form submitted, and update existing
   # artist record with ID <artist_id> using the new attributes
+  form = ArtistForm()
+  artist = Artist.query.get(artist_id)
+
+  artist.name = form.name.data
+  artist.city = form.city.data
+  artist.state = form.state.data
+  artist.phone = form.phone.data
+  artist.genres = ','.join(form.genres.data),
+  artist.image_link = form.image_link.data
+  artist.facebook_link = form.facebook_link.data
+  artist.website = form.website.data
+  artist.seeking_venue = form.seeking_venue.data
+  artist.seeking_description = form.seeking_description.data
+
+  try:
+    db.session.commit()
+    flash('Artist ' + artist.name + ' was successfully updated!')
+  except:
+    db.session.rollback()
+    flash('An error occurred. Artist ' + artist.name + ' could not be updated.')
+  finally:
+    db.session.close()
 
   return redirect(url_for('show_artist', artist_id=artist_id))
 
