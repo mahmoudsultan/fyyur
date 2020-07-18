@@ -10,7 +10,7 @@ from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 import logging
 from logging import Formatter, FileHandler
-from flask_wtf import Form
+from flask_wtf import Form, CSRFProtect
 from forms import *
 from flask_migrate import Migrate
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -23,6 +23,7 @@ app = Flask(__name__)
 moment = Moment(app)
 app.config.from_object('config')
 db = SQLAlchemy(app)
+csrf = CSRFProtect(app)
 
 migrate = Migrate(app, db)
 
@@ -198,6 +199,10 @@ def create_venue_form():
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
   form = VenueForm()
+
+  if not form.validate():
+    flash(f'Following Errors Occurred: {form.errors} ')
+    return render_template('forms/new_venue.html', form=form)
 
   data = {
     'name': form.name.data,
@@ -376,6 +381,10 @@ def create_artist_form():
 def create_artist_submission():
   form = ArtistForm()
 
+  if not form.validate():
+    flash(f'Following Errors Occurred: {form.errors} ')
+    return render_template('forms/new_artist.html', form=form)
+
   data = {
     'name': form.name.data,
     'city': form.city.data,
@@ -423,6 +432,11 @@ def create_shows():
 @app.route('/shows/create', methods=['POST'])
 def create_show_submission():
   form = ShowForm()
+
+  if not form.validate():
+    flash(f'Following Errors Occurred: {form.errors} ')
+    return render_template('forms/new_show.html', form=form)
+
   data = {
     'artist_id': form.artist_id.data,
     'venue_id': form.venue_id.data,
@@ -437,7 +451,7 @@ def create_show_submission():
     flash('Show was successfully listed!')
   except:
     db.session.rollback()
-    flash('Something went wrong')
+    flash('Something went wrong, Show was not successfuly listed!')
   finally:
     db.session.close()
 

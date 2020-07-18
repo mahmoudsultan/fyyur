@@ -5,7 +5,13 @@ from wtforms.validators import DataRequired, AnyOf, URL, ValidationError
 import phonenumbers
 
 def validate_phonenumber(form, field):
-    p = phonenumbers.parse(field.data, 'US')
+    p = ''
+
+    try:
+        p = phonenumbers.parse(field.data, 'US')
+    except:
+        raise ValidationError('Phonenumber is not valid.')
+
     if not phonenumbers.is_valid_number(p):
         raise ValidationError('Phonenumber is not valid.')
 
