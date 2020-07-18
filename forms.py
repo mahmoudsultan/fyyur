@@ -1,13 +1,41 @@
 from datetime import datetime
 from flask_wtf import FlaskForm
 from wtforms.fields import StringField, SelectField, SelectMultipleField, DateTimeField, BooleanField, TextAreaField
-from wtforms.validators import DataRequired, AnyOf, URL
+from wtforms.validators import DataRequired, AnyOf, URL, ValidationError
 import phonenumbers
 
 def validate_phonenumber(form, field):
     p = phonenumbers.parse(field.data, 'US')
     if not phonenumbers.is_valid_number(p):
         raise ValidationError('Phonenumber is not valid.')
+
+VALID_GENRES = [
+    'Alternative',
+    'Blues',
+    'Classical',
+    'Country',
+    'Electronic',
+    'Folk',
+    'Funk',
+    'Hip-Hop',
+    'Heavy Metal',
+    'Instrumental',
+    'Jazz',
+    'Musical Theatre',
+    'Pop',
+    'Punk',
+    'R&B',
+    'Reggae',
+    'Rock n Roll',
+    'Soul',
+    'Other',
+]
+
+def validate_genres(form, field):
+    selected_genres = field.data
+    for selected_genre in selected_genres:
+        if selected_genre not in VALID_GENRES:
+            raise ValidationError('One or more of the selected genres is not valid.')
 
 class ShowForm(FlaskForm):
     artist_id = StringField(
@@ -96,7 +124,7 @@ class VenueForm(FlaskForm):
     )
         # TODO implement enum restriction
     genres = SelectMultipleField(
-        'genres', validators=[DataRequired()],
+        'genres', validators=[DataRequired(), validate_genres],
         choices=[
             ('Alternative', 'Alternative'),
             ('Blues', 'Blues'),
@@ -200,7 +228,7 @@ class ArtistForm(FlaskForm):
     )
     genres = SelectMultipleField(
         # TODO implement enum restriction
-        'genres', validators=[DataRequired()],
+        'genres', validators=[DataRequired(), validate_genres],
         choices=[
             ('Alternative', 'Alternative'),
             ('Blues', 'Blues'),
