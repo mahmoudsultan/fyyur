@@ -266,9 +266,20 @@ def show_artist(artist_id):
 @app.route('/artists/<int:artist_id>/edit', methods=['GET'])
 def edit_artist(artist_id):
   form = ArtistForm()
-  artist= Artist.query.get(artist_id)
+  artist = Artist.query.get(artist_id)
 
   # TODO: populate form with fields from artist with ID <artist_id>
+  form.name.data = artist.name
+  form.phone.data = artist.phone
+  form.seeking_venue.data = artist.seeking_venue
+  form.seeking_description.data = artist.seeking_description
+  form.genres.data = artist.genres.split(',')
+  form.city.data = artist.city
+  form.city.state = artist.state
+  form.image_link.data = artist.image_link
+  form.facebook_link.data = artist.facebook_link
+  form.website.data = artist.website
+
   return render_template('forms/edit_artist.html', form=form, artist=artist)
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
@@ -338,10 +349,10 @@ def create_artist_submission():
     db.session.add(new_artist)
     db.session.commit()
 
-    flash('Artist ' + data['name'] + ' was successfully listed!')
+    flash('Artist ' + new_artist.name + ' was successfully listed!')
   except:
     db.session.rollback()
-    flash('An error occurred. Artist ' + data['name'] + ' could not be listed.')
+    flash('An error occurred. Artist ' + new_artist.name + ' could not be listed.')
   finally:
     db.session.close()
 
