@@ -9,6 +9,6 @@ DEBUG = True
 # Connect to the database
 
 
-# TODO IMPLEMENT DATABASE URL
+# DATABASE URL: Current URI is a Shortcut for me if necessary replace to add <username>:<password> part
 SQLALCHEMY_DATABASE_URI = 'postgres:///fyyur'
 SQLALCHEMY_TRACK_MODIFICATIONS = False
